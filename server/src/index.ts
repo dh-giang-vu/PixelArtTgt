@@ -3,7 +3,7 @@ import { WebSocketServer } from 'ws';
 import initialiseWebSocketServer from './wsserver';
 require("dotenv").config();
 
-let port = process.env.PORT || 4000;
+let port = 4000;
 
 // const server = createServer();
 
