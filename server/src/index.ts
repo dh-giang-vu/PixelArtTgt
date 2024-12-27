@@ -1,20 +1,16 @@
-import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 import initialiseWebSocketServer from './wsserver';
+
+const express = require('express')
+const app = express()
+
 require("dotenv").config();
 
 let port = process.env.PORT || 4000;
 
-const server = createServer();
-
 if (typeof port === "string") {
   port = parseInt(port);
 }
-
-const wss = new WebSocketServer({ server });
-
-
-initialiseWebSocketServer(wss);
 
 // Utility endpoint to wake up Render instance
 // server.on('request', (req, res) => {
@@ -26,6 +22,10 @@ initialiseWebSocketServer(wss);
 //   }
 // });
 
-server.listen(port, '0.0.0.0', () => {
+const server = app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+
+const wss = new WebSocketServer({ server });
+
+initialiseWebSocketServer(wss);
