@@ -11,6 +11,10 @@ class RoomManager {
   removeUserFromRoom(userId: string, roomId: string) {
     this.rooms[roomId].delete(userId);
   }
+
+  getAllUsersFromRoom(roomId: string) {
+    return this.rooms[roomId];
+  }
 }
 
 export default RoomManager;

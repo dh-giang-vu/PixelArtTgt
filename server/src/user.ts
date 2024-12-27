@@ -33,7 +33,7 @@ class UserManager {
       socket
     }
 
-    return { userId, roomId };
+    return { userId, roomId, username };
   }
 
   deleteUser(userId: string) {
@@ -42,6 +42,10 @@ class UserManager {
 
   getUserById(userId: string) {
     return this.users[userId];
+  }
+
+  getUserSocketById(userId: string) {
+    return this.users[userId].socket;
   }
 
 }
