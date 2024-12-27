@@ -1,28 +1,18 @@
 import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
-import { URL } from 'url';
-import { v4 as uuidv4 } from 'uuid';
+import UserManager from './user';
 
-const PORT = process.env.PORT || 8080;
+const port = process.env.PORT || 8080;
 
 const server = createServer();
 const wss = new WebSocketServer({ server });
 
+const userManager = new UserManager();
 
 wss.on('connection', function connection(socket, request) {
 
-  const requestUrl = new URL(request.url || "/", `http://${request.headers.host}`);
-
-  const username = requestUrl.searchParams.get('username');
-  const roomId = requestUrl.searchParams.get('roomId');
-
-  if (!username || !roomId) {
-    socket.close(1003, "Missing username or roomId.");
-    return;
-  }
-
-  const userId = uuidv4();
-  socket.send(`Username: ${username}, UserId: ${userId}, Room: ${roomId}`);
+  const { userId, roomId } = userManager.addUser(socket, request);
+  // roomManager.addUserToRoom(userId, roomId)
 
   // Echo data back to user
   socket.on('message', (data) => {
@@ -30,11 +20,11 @@ wss.on('connection', function connection(socket, request) {
   })
 
   socket.on('close', () => {
-    console.log(`${username} disconnected.`);
+    console.log(`${userId} in room ${roomId} disconnected.`);
   });
 
 });
 
-server.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+server.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
 });
