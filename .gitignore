@@ -1,3 +1,4 @@
 node_modules
 dist
 firebase-hosting-pull-request.yml
+.env
