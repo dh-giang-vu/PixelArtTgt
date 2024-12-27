@@ -12,7 +12,7 @@ type User = {
 class UserManager {
   private users: Record<string, User> = {};
 
-  addUser(socket: WebSocket, request: IncomingMessage) {
+  createUser(socket: WebSocket, request: IncomingMessage) {
     // Extract username and roomId from request
     const requestUrl = new URL(request.url || "/", `http://${request.headers.host}`);
     const username = requestUrl.searchParams.get('username');
@@ -36,7 +36,7 @@ class UserManager {
     return { userId, roomId };
   }
 
-  removeUser(userId: string) {
+  deleteUser(userId: string) {
     delete this.users[userId];
   }
 
