@@ -2,19 +2,23 @@ import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 import initialiseWebSocketServer from './wsserver';
 
-const port = process.env.PORT || 8080;
+require('dotenv').config();
+
+const port = process.env.PORT || 4000;
 
 const server = createServer();
-const wss = new WebSocketServer({ server });
 
-initialiseWebSocketServer(wss);
-
-// Utility endpoint to wake up Render instance
 server.on('request', (req, res) => {
   const url = req.url;
   
+  // Utitlity endpoint to ping server
   if (url === '/api/ping') {
-    res.write("Pong.");
+    res.writeHead(200);
+    res.end('Pong.');
+  }
+  // Default response for non-specified routes
+  else {
+    res.writeHead(404);
     res.end();
   }
 });
@@ -22,3 +26,7 @@ server.on('request', (req, res) => {
 server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+
+// WebSocketServer
+const wss = new WebSocketServer({ server });
+initialiseWebSocketServer(wss);
