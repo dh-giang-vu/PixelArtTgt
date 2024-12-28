@@ -2,8 +2,14 @@ import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 import initialiseWebSocketServer from './wsserver';
 
+require('dotenv').config();
+
 const port = process.env.PORT || 4000;
-const server = createServer();
+
+const server = createServer((_req, res) => {
+  res.writeHead(404);
+  res.end();
+});
 
 // Utility endpoint to wake up Render instance
 // server.on('request', (req, res) => {
