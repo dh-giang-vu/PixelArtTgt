@@ -6,20 +6,20 @@ require('dotenv').config();
 
 const port = process.env.PORT || 4000;
 
-const server = createServer((_req, res) => {
-  res.writeHead(404);
-  res.end();
-});
+const server = createServer();
 
-// Utility endpoint to wake up Render instance
-// server.on('request', (req, res) => {
-//   const url = req.url;
+server.on('request', (req, res) => {
+  const url = req.url;
   
-//   if (url === '/api/ping') {
-//     res.write("Pong.");
-//     res.end();
-//   }
-// });
+  if (url === '/api/ping') {
+    res.writeHead(200);
+    res.end('Pong.');
+  }
+  else {
+    res.writeHead(404);
+    res.end();
+  }
+});
 
 server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
