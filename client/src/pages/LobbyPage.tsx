@@ -32,7 +32,7 @@ export default function LobbyPage() {
 
   return (
     <div className='lobby-container'>
-      <h3>Welcome</h3>
+      <h1>Welcome</h1>
       <form className='lobby-form' onSubmit={handleFormSubmit}>
         <input type="text" name="username" id="username" placeholder='username' value={playerInfo.username} onChange={(e) => playerInfo.setUsername(e.target.value)} />
         <input type="text" name="roomId" id="roomId" placeholder='roomId' value={playerInfo.roomId} onChange={(e) => playerInfo.setRoomId(e.target.value)} />

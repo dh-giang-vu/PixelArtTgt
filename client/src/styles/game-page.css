@@ -1,0 +1,31 @@
+.game-board-container {
+  border: 3px solid rgb(128, 128, 128);
+  border-radius: 5px;
+  box-sizing: border-box;
+  width: 90%;
+  height: 80%;
+  /* background-color: antiquewhite; */
+
+  /* Centre div */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.lobby-btn-container {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  bottom: 0px;
+  -webkit-transform: translate(0%, 110%);
+  transform: translate(0%, 110%);
+}
+
+.to-lobby-btn {
+  max-width: 200px;
+}

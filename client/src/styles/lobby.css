@@ -13,3 +13,8 @@
   flex-direction: column;
   gap: 10px;
 }
+
+.lobby-form input, button, p {
+  font-size: 1.5rem;
+  max-width: 70vw;
+}

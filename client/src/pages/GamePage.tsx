@@ -1,4 +1,6 @@
+import GameBoard from '../components/GameBoard';
 import { usePlayerInfo } from '../contexts/PlayerInfoContext';
+import '../styles/game-page.css';
 
 export default function GamePage() {
 
@@ -6,12 +8,12 @@ export default function GamePage() {
 
   return (
     <>
-      <div style={{ fontWeight: "bold", marginTop: 10 }}>
-        Game Page
+      <div className='game-board-container'>
+        <GameBoard />
+        <div className='lobby-btn-container'>
+          <button className='to-lobby-btn' onClick={playerInfo.logout}>{"<"} Back to Lobby</button>
+        </div>
       </div>
-      <button onClick={playerInfo.logout} style={{ marginTop: 10 }}>
-        {"<"} Back to Lobby
-      </button>
     </>
   )
 }

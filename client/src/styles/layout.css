@@ -6,6 +6,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: stretch;
   
   height: 100vh;
 }
@@ -13,17 +14,43 @@ body {
 .header {
   /* background-color: aqua; */
   font-weight: bold;
-  font-size: larger;
+  font-size: 3rem;
 }
 
 .footer {
   /* background-color: aqua; */
   align-self: center;
   font-weight: lighter;
-  font-size: small;
+  font-size: 1.3rem;
 }
 
 .layout-body {
   background-color: rgb(236, 236, 236);
   flex-grow: 1;
+}
+
+@media (max-width: 450px),
+        (max-height: 500px) {
+
+  .header {
+    font-size: 1.6rem;
+  }
+
+  .footer {
+    font-size: 1rem;
+  }
+
+  .game-board-container {
+    min-width: 100%;
+  }
+}
+
+@media (max-height: 600px) {
+  .header {
+    display: none;
+  }
+
+  .footer {
+    display: none;
+  }
 }
