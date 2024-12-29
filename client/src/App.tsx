@@ -1,9 +1,17 @@
+import { usePlayerInfo } from "./contexts/PlayerInfoContext"
+import Layout from "./Layout"
+import GamePage from "./pages/GamePage";
+import LobbyPage from "./pages/LobbyPage";
+
 function App() {
+
+  const { hasPlayerInfo } = usePlayerInfo();
 
   return (
     <>
-    <h1>Pixel Art TGT Client</h1>
-    <p>Nothing here yet.</p>
+      <Layout>
+        {hasPlayerInfo() ? <GamePage /> : <LobbyPage />}
+      </Layout>
     </>
   )
 }
