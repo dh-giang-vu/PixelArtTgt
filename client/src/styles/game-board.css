@@ -1,0 +1,135 @@
+@media (max-aspect-ratio: 3/2.5) {
+  .game-board-grid-container {
+    background-color: rgb(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    grid-template-rows: 6fr 1fr 1fr;
+    grid-template-columns: 1fr 2fr;
+    grid-template-areas:
+      'main main'
+      'sidebar-top sidebar-mid'
+      'sidebar-bot sidebar-mid';
+  }
+
+  .sidebar-top {
+    grid-area: sidebar-top;
+  }
+
+  .sidebar-mid {
+    grid-area: sidebar-mid;
+  }
+
+  .sidebar-mid .react-colorful {
+    width: 120px;
+    height: 120px;
+  }
+
+  .sidebar-mid .react-colorful__hue {
+    height: 20px;
+  }
+
+  .sidebar-bot {
+    grid-area: sidebar-bot;
+  }
+
+  .main {
+    grid-area: main;
+  }
+
+  .color-picker-container.vertical {
+    display: none;
+  }
+
+}
+
+@media (min-aspect-ratio: 3/2.5) {
+  .game-board-grid-container {
+    background-color: rgb(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    grid-template-rows: 1fr 10fr 1fr;
+    grid-template-columns: 1fr 3fr;
+    grid-template-areas:
+      'sidebar-top main'
+      'sidebar-mid main'
+      'sidebar-bot main';
+  }
+
+  .sidebar {
+    /* border-right: 3px solid rgb(255, 255, 255); */
+    padding-left: 10%;
+  }
+
+  .sidebar-top {
+    grid-area: sidebar-top;
+    /* background-color: rgba(0, 255, 255, 0.5); */
+  }
+
+  .sidebar-mid {
+    grid-area: sidebar-mid;
+    /* background-color: rgba(165, 42, 42, 0.5); */
+
+    padding-left: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* gap: 5px; */
+  }
+
+  .sidebar-bot {
+    grid-area: sidebar-bot;
+    /* background-color: rgba(0, 255, 255, 0.5); */
+  }
+
+  .main {
+    grid-area: main;
+    /* background-color: rgba(79, 250, 116, 0.5); */
+  }
+
+  .color-picker-container.horizontal {
+    display: none;
+  }
+}
+
+@media (aspect-ratio: 1/1) {}
+
+@media (max-height: 650px) {
+  .color-picker-container {
+    height: 50%;
+    width: auto;
+  }
+
+  .hex-input,
+  .rgb-input label {
+    display: none;
+  }
+
+  .game-board-grid-container {
+    background-color: rgb(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    grid-template-rows: minmax(0px, 1fr);
+    grid-template-columns: 1fr 3fr;
+    grid-template-areas:
+      'sidebar-mid main';
+  }
+
+  .sidebar-top, 
+  .sidebar-bot {
+    display: none;
+  }
+}
+
+
+.sidebar {
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgb(255, 255, 255);
+}

@@ -27,6 +27,13 @@ body {
 .layout-body {
   background-color: rgb(236, 236, 236);
   flex-grow: 1;
+
+  background-image: url('../assets/background-art.jpg');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+
+  color: white;
 }
 
 @media (max-width: 450px),
