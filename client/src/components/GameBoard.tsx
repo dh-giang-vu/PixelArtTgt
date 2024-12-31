@@ -4,16 +4,6 @@ import Canvas from "./Canvas";
 
 export default function GameBoard() {
 
-  function drawWhiteRectangle(ctx: CanvasRenderingContext2D, w: number, h: number) {
-    ctx.fillStyle = "white";
-    ctx.rect(20, 20, w, h);
-    ctx.fill();
-  }
-
-  function drawSomething(ctx: CanvasRenderingContext2D) {
-    drawWhiteRectangle(ctx, 200, 100);
-  }
-
   return (
     <div className="game-board-grid-container">
       
