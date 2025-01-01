@@ -27,7 +27,7 @@ export default function GameBoard() {
 
       <div className="main" style={{ overflow: "hidden" }} ref={ref}>
         {image !== null ?
-          (<Canvas width={dimension.width} height={dimension.height} imgWidth={500} imgHeight={500} />)
+          (<Canvas width={dimension.width} height={dimension.height} image={image} />)
           : (<ImageUploader onUpload={(img) => setImage(img)} />)
         }
       </div>

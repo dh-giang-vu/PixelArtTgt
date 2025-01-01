@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import useKeyDown from "../hooks/useKeyDown";
+import useProcessedImage from "../hooks/useProcessedImage";
 
 
 const origin = {
@@ -10,16 +11,16 @@ const origin = {
 const POSITION_CHANGE = 5;
 
 interface CanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
-  imgWidth: number,
-  imgHeight: number,
+  image: HTMLImageElement
 }
 
-export default function Canvas({ imgWidth, imgHeight, ...other }: CanvasProps) {
+export default function Canvas({ image, ...other }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [imgPosition, setImgPosition] = useState(origin);
   const [imgScale, setImgScale] = useState(1);
   const { key, timeStamp} = useKeyDown();
+  const processedImg = useProcessedImage(image);
 
   // setup canvas and set context
   useEffect(() => {
@@ -28,38 +29,49 @@ export default function Canvas({ imgWidth, imgHeight, ...other }: CanvasProps) {
       const ctx = canvasRef.current.getContext("2d");
 
       if (ctx) {
+        ctx.fillStyle = "white";
+        ctx.strokeStyle = "white";
         setContext(ctx);
       }
     }
-  }, [canvasRef.current, imgWidth, imgHeight]);
+  }, [canvasRef.current]);
 
-  // initial draw
+
+  // useEffect(() => {
+  //   if (context) {
+  //     // context.fillStyle = "white";
+  //     // context.strokeStyle = "white";
+  //     clearCanvas();
+  //     drawImage();
+  //   }
+  // }, [canvasRef.current, context, processedImg, other.width, other.height, processedImg?.width, processedImg?.height]);
+
+
+  // clear canvas + redraw the image when position or scale or canvas size change
   useEffect(() => {
+    console.log("redraw");
     if (context) {
-      context.fillStyle = "white";
-      context.strokeStyle = "white";
       clearCanvas();
       drawImage();
     }
-  }, [canvasRef.current, context, other.width, other.height, imgWidth, imgHeight]);
-
-
-  // clear canvas + redraw the image when position or scale change
-  useEffect(() => {
-    if (context) {
-      clearCanvas();
-      drawImage();
-    }
-  }, [imgPosition, imgScale]);
+  }, [imgPosition, imgScale, processedImg, other.width, other.height]);
 
   function drawImage() {
+    if (!processedImg) {
+      return;
+    }
     if (context) {
-      context.fillRect(imgPosition.x, imgPosition.y, imgWidth, imgHeight);
+      context.fillRect(imgPosition.x, imgPosition.y, processedImg.width, processedImg.height);
+      context.drawImage(processedImg, imgPosition.x, imgPosition.y);
     }
   }
 
   // image panning listener
   useEffect(() => {
+    // disallow moving image when it is not processed
+    if (!processedImg) {
+      return;
+    }
     if (key === "w") {
       moveImageUp();
     }
@@ -72,17 +84,21 @@ export default function Canvas({ imgWidth, imgHeight, ...other }: CanvasProps) {
     else if (key === "d") {
       moveImageRight();
     }
-  }, [key, timeStamp]);
+  }, [key, timeStamp, processedImg]);
 
   // zoom listener
   useEffect(() => {
+    // disallow moving image when it is not processed
+    if (!processedImg) {
+      return;
+    }
     if (key === "q") {
       zoomOut();
     }
     else if (key === "e") {
       zoomIn();
     }
-  }, [key, timeStamp]);
+  }, [key, timeStamp, processedImg]);
 
   function clearCanvas() {
     if(context) {
@@ -126,7 +142,7 @@ export default function Canvas({ imgWidth, imgHeight, ...other }: CanvasProps) {
 
   return (
     <>
-      <canvas ref={canvasRef} { ...other }></canvas>
+      <canvas ref={canvasRef} { ...other } hidden={processedImg === null}></canvas>
       {/* <div style={{ position: "absolute", top: 550 }}>
         <button onClick={moveImageDown}>Move Image Down</button>
         <button onClick={moveImageUp}>Move Image Up</button>
