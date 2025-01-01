@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function useDivDimension(initWidth=0, initHeight=0) {
   const ref = useRef<HTMLDivElement>(null);
