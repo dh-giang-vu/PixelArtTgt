@@ -28,20 +28,20 @@ export default function Canvas({ imgWidth, imgHeight, ...other }: CanvasProps) {
       const ctx = canvasRef.current.getContext("2d");
 
       if (ctx) {
-        ctx.fillStyle = "white";
-        ctx.strokeStyle = "white";
         setContext(ctx);
       }
     }
-  }, [imgWidth, imgHeight]);
+  }, [canvasRef.current, imgWidth, imgHeight]);
 
   // initial draw
   useEffect(() => {
     if (context) {
+      context.fillStyle = "white";
+      context.strokeStyle = "white";
       clearCanvas();
       drawImage();
     }
-  }, [imgWidth, imgHeight, context]);
+  }, [canvasRef.current, context, other.width, other.height, imgWidth, imgHeight]);
 
 
   // clear canvas + redraw the image when position or scale change

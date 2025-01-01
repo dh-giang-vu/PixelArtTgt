@@ -1,8 +1,10 @@
 import CustomColorPicker from "./CustomColorPicker";
 import '../styles/game-board.css';
 import Canvas from "./Canvas";
+import useDivDimension from "../hooks/useElementDimension";
 
 export default function GameBoard() {
+  const { ref, dimension } = useDivDimension();
 
   return (
     <div className="game-board-grid-container">
@@ -20,8 +22,8 @@ export default function GameBoard() {
         Online: 1
       </div>
 
-      <div className="main" style={{ overflow: "hidden" }}>
-        <Canvas width={1000} height={1000} imgWidth={500} imgHeight={350}/>
+      <div className="main" style={{ overflow: "hidden" }} ref={ref}>
+        <Canvas width={dimension.width} height={dimension.height} imgWidth={500} imgHeight={500}/>
       </div>
     
     </div>
