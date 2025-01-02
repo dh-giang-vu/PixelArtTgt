@@ -20,7 +20,7 @@ export default function Canvas({ image, ...other }: CanvasProps) {
   const [imgPosition, setImgPosition] = useState(origin);
   const [imgScale, setImgScale] = useState(1);
   const { key, timeStamp} = useKeyDown();
-  const processedImg = useProcessedImage(image);
+  const { processedImg } = useProcessedImage(image);
 
   // setup canvas and set context
   useEffect(() => {
