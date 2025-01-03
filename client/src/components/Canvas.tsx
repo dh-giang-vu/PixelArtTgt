@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import useKeyDown from "../hooks/useKeyDown";
 import useProcessedImage from "../hooks/useProcessedImage";
+import '../styles/canvas.css';
 
 
 const origin = {
-  x: 10,
-  y: 10,
+  x: 0,
+  y: 0,
 }
 
 const POSITION_CHANGE = 5;
@@ -20,7 +21,7 @@ export default function Canvas({ image, ...other }: CanvasProps) {
   const [imgPosition, setImgPosition] = useState(origin);
   const [imgScale, setImgScale] = useState(1);
   const { key, timeStamp} = useKeyDown();
-  const { processedImg } = useProcessedImage(image);
+  const { processedImg, ...imgSettings } = useProcessedImage(image);
 
   // setup canvas and set context
   useEffect(() => {
@@ -140,18 +141,29 @@ export default function Canvas({ image, ...other }: CanvasProps) {
     }
   }
 
+  function handleImageSettingsFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if ("value" in e.currentTarget[0] && typeof e.currentTarget[0].value === "string") {
+      const blockDimension = parseInt(e.currentTarget[0].value);
+      imgSettings.setBlockDimension(blockDimension);
+    }
+    if ("value" in e.currentTarget[1] && typeof e.currentTarget[1].value === "string") {
+      const maxNumColor = parseInt(e.currentTarget[1].value);
+      imgSettings.setMaximumColorCount(maxNumColor);
+    }
+  }
+
   return (
     <>
       <canvas ref={canvasRef} { ...other } hidden={processedImg === null}></canvas>
-      {/* <div style={{ position: "absolute", top: 550 }}>
-        <button onClick={moveImageDown}>Move Image Down</button>
-        <button onClick={moveImageUp}>Move Image Up</button>
-        <button onClick={moveImageLeft}>Move Image Left</button>
-        <button onClick={moveImageRight}>Move Image Right</button>
-        <button onClick={zoomOut}>Zoom Out</button>
-        <button onClick={zoomIn}>Zoom In</button>
-        <button onClick={clearCanvas}>Clear Canvas</button>
-      </div> */}
+
+      <form className="imgSettingsForm" style={{ position: "absolute", bottom: 0 }} onSubmit={handleImageSettingsFormSubmit}>
+        <label htmlFor="blockDimension">Block Dimension: </label>
+        <input type="number" name="blockDimension" id="blockDimension" required min={1} max={100} defaultValue={imgSettings.blockDimension}/>
+        <label htmlFor="maxNumColor">Max Number of Color: </label>
+        <input type="number" name="maxNumColor" id="maxNumColor" required min={1} max={255} defaultValue={imgSettings.maximumColorCount}/>
+        <button type="submit">Submit</button>
+      </form>
     </>
   );
 }

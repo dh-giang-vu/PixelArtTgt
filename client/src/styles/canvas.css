@@ -1,0 +1,27 @@
+.imgSettingsForm {
+  /* background-color: antiquewhite; */
+  left: 50%;
+  -webkit-transform: translate(-50%, 0%);
+  transform: translate(-50%, 0%);
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 10px 0px;
+  
+}
+
+.imgSettingsForm button {
+  font-size: 1rem;
+}
+
+.imgSettingsForm input {
+  max-width: 45px;
+  box-sizing: border-box;
+  /* border: 0px;
+  padding: 0; */
+}

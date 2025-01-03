@@ -25,11 +25,13 @@ export default function GameBoard() {
         Online: 1
       </div>
 
-      <div className="main" style={{ overflow: "hidden" }} ref={ref}>
-        {image !== null ?
-          (<Canvas width={dimension.width} height={dimension.height} image={image} />)
-          : (<ImageUploader onUpload={(img) => setImage(img)} />)
-        }
+      <div className="main" style={{ overflow: "hidden", position: "relative" }} ref={ref}>
+        <div style={{ position: "absolute", width: "100%", height: "100%" }}>
+          {image !== null ?
+            (<Canvas width={dimension.width} height={dimension.height} image={image} />)
+            : (<ImageUploader onUpload={(img) => setImage(img)} />)
+          }
+        </div>
       </div>
 
     </div>
