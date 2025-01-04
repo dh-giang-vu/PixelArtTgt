@@ -20,7 +20,17 @@ export default function ArtPreviewCanvas({image, ...other} : ArtPreviewCanvasPro
       clearCanvas();
       drawImage(context);
     }
-  }, [imgPosition, imgScale, processedImg, other.width, other.height, context]);
+  }, [imgPosition, imgScale, processedImg, context]);
+
+  useEffect(() => {
+    console.log("resize redraw");
+    if (context) {
+      context.setTransform(imgScale, 0, 0, imgScale, 0, 0);
+      clearCanvas();
+      drawImage(context);
+    }
+
+  }, [other.width, other.height]);
 
   function drawImage(ctx: CanvasRenderingContext2D) {
     if (processedImg) {

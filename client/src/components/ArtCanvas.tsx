@@ -5,7 +5,7 @@ interface ArtCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
   image: HTMLImageElement;
 }
 
-export default function ArtCanvas({ image, ...other } : ArtCanvasProps) {
+export default function ArtCanvas({ image, ...other }: ArtCanvasProps) {
 
   const { canvasRef, context, imgPosition, imgScale, clearCanvas } = useCanvas();
 
@@ -13,10 +13,19 @@ export default function ArtCanvas({ image, ...other } : ArtCanvasProps) {
     console.log("redraw");
     if (context) {
       clearCanvas();
-      context.fillStyle = "#FFFFFF70";
       drawImage(context);
     }
-  }, [imgPosition, imgScale, image, other.width, other.height, context]);
+  }, [imgPosition, imgScale, image, context]);
+
+  useEffect(() => {
+    console.log("resize redraw");
+    if (context) {
+      context.setTransform(imgScale, 0, 0, imgScale, 0, 0);
+      clearCanvas();
+      drawImage(context);
+    }
+
+  }, [other.width, other.height]);
 
   useEffect(() => {
     if (!canvasRef.current) {
@@ -35,9 +44,10 @@ export default function ArtCanvas({ image, ...other } : ArtCanvasProps) {
   })
 
   function drawImage(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = "#FFFFFF70";
     ctx.drawImage(image, imgPosition.x, imgPosition.y);
     ctx.fillRect(imgPosition.x, imgPosition.y, image.width, image.height);
   }
 
-  return <canvas ref={canvasRef} { ...other }></canvas>;
+  return <canvas ref={canvasRef} {...other}></canvas>;
 }
