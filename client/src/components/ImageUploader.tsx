@@ -11,7 +11,9 @@ export default function ImageUploader({ onUpload } : { onUpload: (img: HTMLImage
       if (dataUrl) {
         const img = new Image();
         img.src = dataUrl?.toString();
-        onUpload(img);
+        img.onload = () => {
+          onUpload(img);
+        }
       }
     }
 

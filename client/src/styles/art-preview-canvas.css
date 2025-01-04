@@ -1,0 +1,16 @@
+.preview-container {
+  position: relative;
+}
+
+.settings-form {
+  position: absolute;
+  bottom: 4px;
+
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+.settings-form div {
+  padding: 5px 15px;
+}
+

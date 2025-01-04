@@ -1,10 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function useKeyDown() {
   const [keyDown, setKeyDown] = useState({
     key: "",
     timeStamp: 0
   });
+
+  const keyDownRef = useRef(keyDown);
+
+  useEffect(() => {
+    keyDownRef.current = keyDown;
+  }, [keyDown]);
 
   useEffect(() => {
     function updateKeyDown(e: KeyboardEvent) {
@@ -15,7 +21,7 @@ export default function useKeyDown() {
     }
 
     function updateKeyUp(e: KeyboardEvent) {
-      if (e.key === keyDown.key) {
+      if (e.key === keyDownRef.current.key) {
         setKeyDown({
           key: "",
           timeStamp: e.timeStamp,

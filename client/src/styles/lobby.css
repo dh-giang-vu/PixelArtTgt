@@ -14,7 +14,11 @@
   gap: 10px;
 }
 
-.lobby-form input, button, p {
+.lobby-form input, p {
   font-size: 1.5rem;
   max-width: 70vw;
+}
+
+.lobby-container button {
+  font-size: 1.5rem;
 }
