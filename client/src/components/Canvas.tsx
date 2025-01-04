@@ -20,7 +20,7 @@ export default function Canvas({ image, ...other }: CanvasProps) {
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [imgPosition, setImgPosition] = useState(origin);
   const [imgScale, setImgScale] = useState(1);
-  const { key, timeStamp} = useKeyDown();
+  const { key, timeStamp } = useKeyDown();
   const { processedImg, ...imgSettings } = useProcessedImage(image);
 
   // setup canvas and set context
@@ -69,10 +69,6 @@ export default function Canvas({ image, ...other }: CanvasProps) {
 
   // image panning listener
   useEffect(() => {
-    // disallow moving image when it is not processed
-    if (!processedImg) {
-      return;
-    }
     if (key === "w") {
       moveImageUp();
     }
@@ -85,21 +81,17 @@ export default function Canvas({ image, ...other }: CanvasProps) {
     else if (key === "d") {
       moveImageRight();
     }
-  }, [key, timeStamp, processedImg]);
+  }, [key, timeStamp]);
 
   // zoom listener
   useEffect(() => {
-    // disallow moving image when it is not processed
-    if (!processedImg) {
-      return;
-    }
     if (key === "q") {
       zoomOut();
     }
     else if (key === "e") {
       zoomIn();
     }
-  }, [key, timeStamp, processedImg]);
+  }, [key, timeStamp]);
 
   function clearCanvas() {
     if(context) {

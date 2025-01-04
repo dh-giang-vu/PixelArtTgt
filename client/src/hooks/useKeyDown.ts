@@ -14,9 +14,20 @@ export default function useKeyDown() {
       });
     }
 
+    function updateKeyUp(e: KeyboardEvent) {
+      if (e.key === keyDown.key) {
+        setKeyDown({
+          key: "",
+          timeStamp: e.timeStamp,
+        });
+      }
+    }
+
     window.addEventListener("keydown", updateKeyDown);
+    window.addEventListener("keyup", updateKeyUp);
     return () => {
       window.removeEventListener("keydown", updateKeyDown);
+      window.removeEventListener("keyup", updateKeyUp);
     }
   }, []);
 
