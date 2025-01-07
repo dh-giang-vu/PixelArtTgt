@@ -10,7 +10,7 @@ import ArtCanvas from "./ArtCanvas";
 export default function GameBoard() {
   const { ref, dimension } = useDivDimension();
   const [image, setImage] = useState<HTMLImageElement | null>(null);
-  const { pixelArt } = usePixelArtContext();
+  const { pixelArt, blockDimension, getPixelArtImageData } = usePixelArtContext();
 
   return (
     <div className="game-board-grid-container">
@@ -30,7 +30,7 @@ export default function GameBoard() {
 
       <div className="main" style={{ overflow: "hidden", position: "relative" }} ref={ref}>
         <div style={{ position: "absolute", width: "100%", height: "100%" }}>
-          {pixelArt && <ArtCanvas width={dimension.width} height={dimension.height} image={pixelArt} />}
+          {pixelArt && blockDimension && <ArtCanvas width={dimension.width} height={dimension.height} image={pixelArt} imageData={getPixelArtImageData()} blockDimension={blockDimension} />}
           {image && !pixelArt && <ArtPreviewCanvas width={dimension.width} height={dimension.height} image={image} />}
           {!image && !pixelArt && <ImageUploader onUpload={(img) => setImage(img)} />}
         </div>

@@ -12,7 +12,7 @@ export default function ArtPreviewCanvas({image, ...other} : ArtPreviewCanvasPro
   const { canvasRef, context, imgPosition, imgScale, clearCanvas } = useCanvas();
   const { processedImg, ...imgSettings } = useProcessedImage(image);
   const [isSettingVisible, setIsSettingVisible] = useState(true);
-  const { setPixelArt } = usePixelArtContext();
+  const { setPixelArt, setBlockDimension } = usePixelArtContext();
 
   useEffect(() => {
     console.log("redraw");
@@ -50,6 +50,11 @@ export default function ArtPreviewCanvas({image, ...other} : ArtPreviewCanvasPro
     }
   }
 
+  function confirmPixelArt() {
+    setPixelArt(processedImg);
+    setBlockDimension(imgSettings.blockDimension);
+  }
+
   return (
     <div className="preview-container">
       {/* {(processedImg !== null) ?
@@ -73,7 +78,7 @@ export default function ArtPreviewCanvas({image, ...other} : ArtPreviewCanvasPro
               <button style={{ marginRight: "5px" }} onClick={() => setIsSettingVisible(false)}>Hide Settings</button>
               <button type="submit">Apply Settings</button>
               <div style={{ padding: 0, marginTop: "5px" }}>
-                <button type="button" style={{ width: "100%" }} onClick={() => setPixelArt(processedImg)}>Confirm & Start</button>
+                <button type="button" style={{ width: "100%" }} onClick={confirmPixelArt}>Confirm & Start</button>
               </div>
             </div>
           </form>
