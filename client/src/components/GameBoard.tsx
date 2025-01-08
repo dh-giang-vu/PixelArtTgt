@@ -1,4 +1,5 @@
-import CustomColorPicker from "./CustomColorPicker";
+// import CustomColorPicker from "./TempCustomPicker";
+import CustomColorPicker, { CustomColor } from "./CustomColorPicker";
 import '../styles/game-board.css';
 import useDivDimension from "../hooks/useElementDimension";
 import { useState } from "react";
@@ -6,11 +7,36 @@ import ImageUploader from "./ImageUploader";
 import ArtPreviewCanvas from "./ArtPreviewCanvas";
 import { usePixelArtContext } from "../contexts/PixelArtContext";
 import ArtCanvas from "./ArtCanvas";
+import { RgbColor } from "react-colorful";
+import { hexToRgb, rgbToHex } from "../utils/colorConvert";
 
 export default function GameBoard() {
   const { ref, dimension } = useDivDimension();
   const [image, setImage] = useState<HTMLImageElement | null>(null);
+  const [color, setColor] = useState<CustomColor>({
+    rgb: { r: 0, g: 0, b: 0 },
+    hex: "#000000"
+  });
   const { pixelArt, blockDimension, getPixelArtImageData } = usePixelArtContext();
+
+  function handleColorPickerChange(newColor: RgbColor | string) {
+    let newHex = "#000000";
+    let newRgb = { r: 0, g: 0, b: 0 };
+    // hex input was changed
+    if (typeof newColor === "string") {
+      newRgb = hexToRgb(newColor);
+      newHex = newColor;
+    }
+    // rgb input was changed
+    else {
+      newRgb = newColor;
+      newHex = rgbToHex(newColor);
+    }
+    setColor({
+      rgb: newRgb,
+      hex: newHex
+    });
+  }
 
   return (
     <div className="game-board-grid-container">
@@ -20,8 +46,8 @@ export default function GameBoard() {
       </div>
 
       <div className="sidebar sidebar-mid">
-        <CustomColorPicker orientation="v" />
-        <CustomColorPicker orientation="h" />
+        <CustomColorPicker orientation="v" color={color} onChange={handleColorPickerChange}/>
+        <CustomColorPicker orientation="h" color={color} onChange={handleColorPickerChange}/>
       </div>
 
       <div className="sidebar sidebar-bot">

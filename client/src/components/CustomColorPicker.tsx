@@ -1,97 +1,68 @@
-import { ChangeEvent, useState } from "react";
-import { HexColorInput, HexColorPicker } from "react-colorful";
+import { HexColorInput, RgbColor, RgbColorPicker } from "react-colorful";
 import '../styles/custom-color-picker.css';
 
-export default function CustomColorPicker({ orientation="v" }) {
-  const [hexColor, setHexColor] = useState("d21997");
-  const [rgbColor, setRgbColor] = useState({
-    r: 0,
-    g: 0,
-    b: 0
-  });
+export type CustomColor = {
+  rgb: RgbColor,
+  hex: string 
+}
 
-  function hexToDecimal(hex: string) {
-    return parseInt(hex, 16);
-  }
+interface CustomColorPickerProps {
+  orientation: "v" | "h";
+  color: CustomColor
+  onChange: (newColor: RgbColor | string) => void;
+}
 
-  function decimalToHex(dec: number, numDigit = 2) {
-    let hex = dec.toString(16);
-    if (hex.length < numDigit) {
-      hex = hex.padStart(numDigit, '0');
-    }
-    return hex;
-  }
-
-  function handleHexChange(e: string) {
-    const hex = e.slice(1);
-    const r = hexToDecimal(hex.slice(0, 2));
-    const g = hexToDecimal(hex.slice(2, 4));
-    const b = hexToDecimal(hex.slice(4, 6));
-
-    setHexColor(hex);
-    setRgbColor({ r, g, b })
-
-  }
-
-  function handleRgbChange(e: ChangeEvent<HTMLInputElement>) {
-    const inputId = e.target.id;
-    let num = parseInt(e.target.value);
-
-    if (num < 0) {
-      num = 0;
-    }
-    else if (num > 255) {
-      num = 255;
+export default function CustomColorPicker({ orientation = "v", color, onChange }: CustomColorPickerProps) {
+  
+  function handleRgbFormChange(e: React.FormEvent<HTMLFormElement>) {
+    if (!(e.target instanceof HTMLInputElement)) {
+      return;
     }
 
-    if (!Number.isNaN(num)) {
-      let newHex = decimalToHex(num);
-      if (inputId === 'red') {
-        newHex += hexColor.slice(2, 6);
-      }
-      else if (inputId === 'green') {
-        newHex = hexColor.slice(0, 2) + newHex + hexColor.slice(4, 6);
-      }
-      else {
-        newHex = hexColor.slice(0, 4) + newHex;
-      }
-      setHexColor(newHex);
+    const num = e.target.value;
+    if (Number.isNaN(num) || parseInt(num) < 0 || parseInt(num) > 255) {
+      return;
     }
 
-    if (inputId === 'red') {
-      setRgbColor({ ...rgbColor, r: num });
+    if (e.target.id === "red") {
+      onChange({ ...color.rgb, r: parseInt(num) });
     }
-    else if (inputId === 'green') {
-      setRgbColor({ ...rgbColor, g: num });
+    else if (e.target.id === "green") {
+      onChange({ ...color.rgb, g: parseInt(num) });
     }
-    else {
-      setRgbColor({ ...rgbColor, b: num });
+    else if (e.target.id === "blue") {
+      onChange({ ...color.rgb, b: parseInt(num) });
     }
   }
-
+  
   return (
-    <div className={"color-picker-container" + (orientation === "h" ? " horizontal" : " vertical")}>
-      <HexColorPicker color={hexColor} onChange={handleHexChange} />
+    <div className={"color-picker-container" + (orientation === "h" ? " horizontal" : " vertical")} >
+      <RgbColorPicker color={color.rgb} onChange={onChange} />
+
       <div className={"color-input-container" + (orientation === "h" ? " horizontal" : " vertical")}>
-        <div className="rgb-input">
+
+        <form className="rgb-input" onChange={handleRgbFormChange}>
           <div>
             <label htmlFor="red">R:</label>
-            <input type="number" name="red" id="red" value={rgbColor.r} onChange={handleRgbChange} />
+            <input type="number" value={color.rgb.r} min={0} max={255} name="red" id="red" onChange={(e) => console.log(e)} />
           </div>
           <div>
             <label htmlFor="green">G:</label>
-            <input type="number" name="green" id="green" value={rgbColor.g} onChange={handleRgbChange} />
+            <input type="number" value={color.rgb.g} min={0} max={255} name="green" id="green" />
           </div>
           <div>
             <label htmlFor="blue">B:</label>
-            <input type="number" name="blue" id="blue" value={rgbColor.b} onChange={handleRgbChange} />
+            <input type="number" value={color.rgb.b} min={0} max={255} name="blue" id="blue" />
           </div>
-        </div>
-        <div className="hex-input" style={{ backgroundColor: "#" + hexColor }}>
-          <HexColorInput name="hex" id="hex" color={hexColor} onChange={handleHexChange} />
+        </form>
+
+        <div className="hex-input" style={{ backgroundColor: color.hex }}>
+          <HexColorInput name="hex" id="hex" color={color.hex} onChange={onChange} />
           <label htmlFor="hex">Hex</label>
         </div>
+
       </div>
+
     </div>
-  )
+  );
 }

@@ -3,7 +3,7 @@ import useCanvas from "../hooks/useCanvas";
 
 interface ArtCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
   image: HTMLImageElement;
-  imageData: ImageData | null
+  imageData: ImageData | null;
   blockDimension: number;
 }
 
@@ -113,7 +113,7 @@ export default function ArtCanvas({ image, imageData, blockDimension, ...other }
     return () => {
       canvas.removeEventListener("click", handleCanvasClick);
     }
-  })
+  }, [canvasRef.current, imgPosition, imgScale, image, imageData]);
 
   function drawImage(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = "#FFFFFFE6";
