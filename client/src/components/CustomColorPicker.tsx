@@ -44,7 +44,7 @@ export default function CustomColorPicker({ orientation = "v", color, onChange }
         <form className="rgb-input" onChange={handleRgbFormChange}>
           <div>
             <label htmlFor="red">R:</label>
-            <input type="number" value={color.rgb.r} min={0} max={255} name="red" id="red" onChange={(e) => console.log(e)} />
+            <input type="number" value={color.rgb.r} min={0} max={255} name="red" id="red" />
           </div>
           <div>
             <label htmlFor="green">G:</label>

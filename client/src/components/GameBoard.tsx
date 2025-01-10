@@ -56,7 +56,16 @@ export default function GameBoard() {
 
       <div className="main" style={{ overflow: "hidden", position: "relative" }} ref={ref}>
         <div style={{ position: "absolute", width: "100%", height: "100%" }}>
-          {pixelArt && blockDimension && <ArtCanvas width={dimension.width} height={dimension.height} image={pixelArt} imageData={getPixelArtImageData()} blockDimension={blockDimension} />}
+          {pixelArt && blockDimension && 
+            <ArtCanvas 
+              width={dimension.width} 
+              height={dimension.height} 
+              image={pixelArt} 
+              imageData={getPixelArtImageData()} 
+              blockDimension={blockDimension} 
+              pickedColor={color.rgb} 
+            />
+          }
           {image && !pixelArt && <ArtPreviewCanvas width={dimension.width} height={dimension.height} image={image} />}
           {!image && !pixelArt && <ImageUploader onUpload={(img) => setImage(img)} />}
         </div>

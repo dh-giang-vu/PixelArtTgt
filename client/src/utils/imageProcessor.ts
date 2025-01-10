@@ -57,6 +57,12 @@ export function processImage(image: HTMLImageElement, blockDimension: number, ma
   }
 
   for (let i = 0; i < image.width; i += blockDimension) {
+    let subtractRowPixels = 0;
+    // check if this is the column with blocks that have less width than blockDimension
+    if (image.width % blockDimension !== 0 && i === image.width - (image.width % blockDimension)) {
+      subtractRowPixels = blockDimension - (image.width % blockDimension);
+    }
+
     for (let j = 0; j < image.height; j += blockDimension) {
       const blockData = context.getImageData(i, j, blockDimension, blockDimension);
       const { r, g, b } = getAverageRGB(blockData, blockDimension * blockDimension);
@@ -65,7 +71,7 @@ export function processImage(image: HTMLImageElement, blockDimension: number, ma
       // fill block with nearest color from the reduced palette to the average rgb
       const blockOrigin = 4 * image.width * j + 4 * i;
       let rowStart = blockOrigin;
-      let rowEnd = rowStart + 4 * blockDimension;
+      let rowEnd = rowStart + 4 * blockDimension - 4*subtractRowPixels;
 
       for (let p = 0; p < blockDimension; p++) {
         for (let q = rowStart; q < rowEnd; q += 4) {
@@ -75,7 +81,7 @@ export function processImage(image: HTMLImageElement, blockDimension: number, ma
           imgData.data[q + 3] = 255;
         }
         rowStart += 4 * image.width;
-        rowEnd = rowStart + 4 * blockDimension;
+        rowEnd = rowStart + 4 * blockDimension - 4*subtractRowPixels;
       }
     }
   }
