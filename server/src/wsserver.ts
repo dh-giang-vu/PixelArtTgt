@@ -10,7 +10,11 @@ const userManager = new UserManager();
 function initialiseWebSocketServer(wss: WebSocketServer) {
   wss.on('connection', (socket, request) => {
 
-    const { userId, roomId, username } = connectUser(socket, request);
+    const user = connectUser(socket, request);
+    if (!user) {
+      return;
+    }
+    const { userId, roomId, username } = user;
 
     socket.on('message', (rawData) => {
       handleMessage(userId, rawData);
@@ -47,6 +51,9 @@ function getJsonFromRawData(rawData: RawData) {
 
 function connectUser(socket: WebSocket, request: IncomingMessage) {
   const r = userManager.createUser(socket, request);
+  if (!r) {
+    return null;
+  }
   roomManager.addUserToRoom(r.userId, r.roomId);
 
   // Notify other users

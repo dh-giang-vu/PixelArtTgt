@@ -21,7 +21,7 @@ class UserManager {
     // Guard username + roomId not null
     if (!username || !roomId) {
       socket.close(1003, "Missing username or roomId.");
-      return;
+      return null;
     }
 
     // Generate uuid + add user
