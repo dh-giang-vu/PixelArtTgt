@@ -5,7 +5,7 @@ import '../styles/game-page.css';
 
 export default function GamePage() {
 
-  const playerInfo = usePlayerInfo();
+  const { logout } = usePlayerInfo();
 
   return (
     <>
@@ -14,7 +14,7 @@ export default function GamePage() {
           <GameBoard />
         </PixelArtContextProvider>
         <div className='lobby-btn-container'>
-          <button className='to-lobby-btn' onClick={playerInfo.logout}>{"<"} Back to Lobby</button>
+          <button className='to-lobby-btn' onClick={logout}>{"<"} Back to Lobby</button>
         </div>
       </div>
     </>

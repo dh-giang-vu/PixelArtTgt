@@ -6,9 +6,10 @@ import useCanvas from "../hooks/useCanvas";
 
 interface ArtPreviewCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
   image: HTMLImageElement;
+  onConfirm?: (pixelArt: HTMLImageElement, blockDimension: number) => void;
 }
 
-export default function ArtPreviewCanvas({image, ...other} : ArtPreviewCanvasProps) {
+export default function ArtPreviewCanvas({image, onConfirm, ...other} : ArtPreviewCanvasProps) {
   const { canvasRef, context, imgPosition, imgScale, clearCanvas } = useCanvas();
   const { processedImg, ...imgSettings } = useProcessedImage(image);
   const [isSettingVisible, setIsSettingVisible] = useState(true);
@@ -51,8 +52,15 @@ export default function ArtPreviewCanvas({image, ...other} : ArtPreviewCanvasPro
   }
 
   function confirmPixelArt() {
+    if (!processedImg) {
+      return;
+    }
     setPixelArt(processedImg);
     setBlockDimension(imgSettings.blockDimension);
+
+    if (onConfirm) {
+      onConfirm(processedImg, imgSettings.blockDimension);
+    }
   }
 
   return (

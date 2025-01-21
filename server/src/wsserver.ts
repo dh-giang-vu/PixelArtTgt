@@ -3,6 +3,7 @@ import UserManager from "./user";
 import RoomManager from "./room";
 import { IncomingMessage } from "http";
 import { isCoordinate } from "./utils";
+import { BufferLike } from "./types";
 
 const roomManager = new RoomManager();
 const userManager = new UserManager();
@@ -16,38 +17,32 @@ function initialiseWebSocketServer(wss: WebSocketServer) {
     }
     const { userId, roomId, username } = user;
 
-    socket.on('message', (rawData) => {
-      handleMessage(userId, rawData);
+    socket.on('message', (rawData, isBinary) => {
+      handleMessage(userId, rawData, isBinary);
     });
-  
+
     socket.on('close', () => {
       roomManager.removeUserFromRoom(userId, roomId);
       userManager.deleteUser(userId);
-  
+
       console.log(`${username} in room ${roomId} disconnected.`);
     });
-  
+
+
+
   });
 }
 
-function broadcastByRoom(roomId: string, data: string) {
+function broadcastByRoom(roomId: string, data: BufferLike, exclude=new Set<string>()) {
   const users = roomManager.getAllUsersFromRoom(roomId);
 
   users.forEach(userId => {
-    userManager.getUserSocketById(userId).send(data);
+    if (!exclude.has(userId)) {
+      userManager.getUserSocketById(userId).send(data);
+    }
   });
 }
 
-function getJsonFromRawData(rawData: RawData) {
-  let data = null;
-  try {
-    data = JSON.parse(rawData.toString());
-  }
-  catch (error) {
-    return null;
-  }
-  return data;
-}
 
 function connectUser(socket: WebSocket, request: IncomingMessage) {
   const r = userManager.createUser(socket, request);
@@ -56,35 +51,48 @@ function connectUser(socket: WebSocket, request: IncomingMessage) {
   }
   roomManager.addUserToRoom(r.userId, r.roomId);
 
+  if (roomManager.getImgChooserId(r.roomId) === r.userId) {
+    socket.send(JSON.stringify({ imgChooser: 1 }));
+  }
+  else {
+    socket.send(JSON.stringify({ imgChooser: 0 }));
+    const image = roomManager.getRoomImage(r.roomId);
+    if (image) {
+      console.log(`Room ${r.roomId} has image`);
+      socket.send(image);
+    }
+  }
+
   // Notify other users
   broadcastByRoom(r.roomId, `User ${r.username} joined room ${r.roomId}.`);
 
   return r;
 }
 
-function disconnectUser(userId: string) {
-  const socket = userManager.getUserSocketById(userId);
-  socket.send("Server disconnecting.");
-  socket.close();
-}
 
-function handleMessage(userId: string, rawData: RawData) {
-  const data = getJsonFromRawData(rawData);
+function handleMessage(userId: string, rawData: RawData, isBinary: boolean) {
   const user = userManager.getUserById(userId);
+  console.log(`Received message from ${user.username}`);
 
-  if (!data) {
-    user.socket.send('Failed to convert data to JSON.');
-    disconnectUser(userId);
+  if (!(rawData instanceof Buffer)) {
     return;
   }
 
-  if (isCoordinate(data)) {
-    broadcastByRoom(user.roomId, `User ${user.username} coordinate: ${JSON.stringify(data)}`);
+
+  if (isBinary) {
+    console.log("Received binary data");
+    const success = roomManager.setRoomImage(userId, user.roomId, rawData);
+
+    if (success) {
+      const roomId = user.roomId;
+      const imgData = roomManager.getRoomImage(roomId);
+      broadcastByRoom(roomId, imgData, new Set([user.userId]));
+    }
   }
-  else {
-    user.socket.send('Not Coordinate');
-  }
-  
+
+  console.log("======================");
+  return null;
 }
+
 
 export default initialiseWebSocketServer;
