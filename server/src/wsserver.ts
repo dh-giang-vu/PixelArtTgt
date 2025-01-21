@@ -22,8 +22,13 @@ function initialiseWebSocketServer(wss: WebSocketServer) {
     });
 
     socket.on('close', () => {
-      roomManager.removeUserFromRoom(userId, roomId);
+      const newImgChooser = roomManager.removeUserFromRoom(userId, roomId);
       userManager.deleteUser(userId);
+
+      if (newImgChooser) {
+        const chooserSocket = userManager.getUserSocketById(newImgChooser);
+        chooserSocket.send(JSON.stringify({ imgChooser: 1 }));
+      }
 
       console.log(`${username} in room ${roomId} disconnected.`);
     });

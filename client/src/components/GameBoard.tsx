@@ -37,7 +37,7 @@ export default function GameBoard() {
 
   // check isImageChooser
   useEffect(() => {
-    if (isImageChooser !== null) {
+    if (isImageChooser === true || pixelArt) {
       return;
     }
 
@@ -49,7 +49,7 @@ export default function GameBoard() {
 
   // check for pixel art of this room sent by server
   useEffect(() => {
-    if (isImageChooser) {
+    if (isImageChooser || pixelArt) {
       return;
     }
 
