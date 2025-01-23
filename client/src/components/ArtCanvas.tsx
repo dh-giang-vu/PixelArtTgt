@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import useCanvas from "../hooks/useCanvas";
 
 interface ArtCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
@@ -14,34 +14,9 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
   const [pixelMap, setPixelMap] = useState((() => {
     const lengthX = Math.ceil(image.width / blockDimension);
     const lengthY = Math.ceil(image.height / blockDimension);
-    const a: boolean[][] = new Array(lengthX).fill(new Array(lengthY).fill(false));
+    const a = new Array(lengthX).fill(new Array(lengthY).fill(null));
     return a;
   })());
-
-  const cover = useMemo(() => {
-    console.log("PixelMap is changing");
-    const path = new Path2D();
-    // clockwise big rectangle covering whole image
-    path.moveTo(imgPosition.x, imgPosition.y);
-    path.lineTo(imgPosition.x + image.width, imgPosition.y);
-    path.lineTo(imgPosition.x + image.width, imgPosition.y + image.height);
-    path.lineTo(imgPosition.x, imgPosition.y + image.height);
-
-    // expose blocks to give the illusion that it has been colored
-    for (let x = 0; x < pixelMap.length; x++) {
-      for (let y = 0; y < pixelMap[0].length; y++) {
-        if (pixelMap[x][y]) {
-          // draw a rectangle hole through the cover
-          path.moveTo(imgPosition.x + x * blockDimension, imgPosition.y + y * blockDimension);
-          path.lineTo(imgPosition.x + x * blockDimension, imgPosition.y + (y + 1) * blockDimension);
-          path.lineTo(imgPosition.x + (x + 1) * blockDimension, imgPosition.y + (y + 1) * blockDimension);
-          path.lineTo(imgPosition.x + (x + 1) * blockDimension, imgPosition.y + y * blockDimension);
-        }
-      }
-    }
-
-    return path;
-  }, [imgPosition, pixelMap]);
 
   useEffect(() => {
     console.log("redraw");
@@ -49,7 +24,7 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
       clearCanvas();
       drawImage(context);
     }
-  }, [imgPosition, imgScale, image, context, cover]);
+  }, [imgPosition, imgScale, image, context, pixelMap]);
 
   useEffect(() => {
     console.log("resize redraw");
@@ -83,28 +58,17 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
         const pixelX = imageOffsetX / imageScaledWidth * image.width;
         const pixelY = imageOffsetY / imageScaledHeight * image.height;
 
-        // check if rgb user-picked color match rgb of chosen block
-        const x = Math.floor(pixelX);
-        const y = Math.floor(pixelY);
-
-        const red = y * (image.width * 4) + x * 4;
-        const pixelRgb = {r: imageData.data[red], g: imageData.data[red+1], b: imageData.data[red+2]};
-        if (JSON.stringify(pickedColor) !== JSON.stringify(pixelRgb) ) {
-          console.log("Not equal: ", pickedColor, pixelRgb);
-          return;
-        }
-
         // find which block this pixel is in 
         //    (in terms of rows and cols - imagine the image as a 2D array of blocks
         //      which is not the same as x-y coordinates)
         const blockX = Math.floor(pixelX / blockDimension);
         const blockY = Math.floor(pixelY / blockDimension);
 
-        if (!pixelMap[blockX][blockY]) {
+        if (pixelMap[blockX][blockY] !== pickedColor) {
           setPixelMap((prev) => {
             const newArr = [...prev];
             newArr[blockX] = [...prev[blockX]];
-            newArr[blockX][blockY] = true;
+            newArr[blockX][blockY] = pickedColor;
             return newArr;
           });
         }
@@ -120,9 +84,31 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
   }, [canvasRef.current, imgPosition, imgScale, image, imageData]);
 
   function drawImage(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = "#FFFFFFB3";
+    if (!imageData) {
+      return;
+    }
+
     ctx.drawImage(image, imgPosition.x, imgPosition.y);
-    ctx.fill(cover);
+    
+    // draw semi-transparent cover on top of pixel art to give the illusion of a guide 
+    ctx.fillStyle = "#FFFFFFB3";
+    ctx.fillRect(imgPosition.x, imgPosition.y, image.width, image.height);
+
+    // draw blocks that have been coloured by people
+    for (let x = 0; x < pixelMap.length; x++) {
+      for (let y = 0; y < pixelMap[0].length; y++) {
+        if (pixelMap[x][y]) {
+          const { r, g, b } = pixelMap[x][y];
+          ctx.fillStyle = `rgb(${r},${g},${b})`
+          ctx.fillRect(
+            imgPosition.x + x * blockDimension,
+            imgPosition.y + y * blockDimension,
+            blockDimension,
+            blockDimension
+          );
+        }
+      }
+    }
 
     // Add text
     showColorText(ctx);
