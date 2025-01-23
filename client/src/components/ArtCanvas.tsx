@@ -8,9 +8,10 @@ interface ArtCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
   imageData: ImageData | null;
   blockDimension: number;
   pickedColor: { r: number, g: number, b: number };
+  predefinedPixelMap: any[][] | null;
 }
 
-export default function ArtCanvas({ image, imageData, blockDimension, pickedColor, ...other }: ArtCanvasProps) {
+export default function ArtCanvas({ image, imageData, blockDimension, pickedColor, predefinedPixelMap, ...other }: ArtCanvasProps) {
 
   const { canvasRef, context, imgPosition, imgScale, clearCanvas } = useCanvas();
   const lengthX = Math.ceil(image.width / blockDimension);
@@ -33,6 +34,13 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
       share: true,
     },
   );
+
+  // if there is a pixelMap update from server, use it instead
+  useEffect(() => {
+    if (predefinedPixelMap) {
+      setPixelMap(predefinedPixelMap);
+    }
+  }, [predefinedPixelMap]);
 
   // check for pixel art updates from other users
   useEffect(() => {

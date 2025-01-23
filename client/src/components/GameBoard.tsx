@@ -35,6 +35,7 @@ export default function GameBoard() {
   );
 
   const { pixelArt, blockDimension, getPixelArtImageData, setPixelArt, setBlockDimension } = usePixelArtContext();
+  const [serverPixelMap, setServerPixelMap] = useState<any[][] | null>(null);
 
   // check isImageChooser
   useEffect(() => {
@@ -88,7 +89,9 @@ export default function GameBoard() {
     if (!msg || typeof msg !== 'object' || !('pixelMap' in msg)) {
       return;
     }
-    console.log(ws.lastJsonMessage);
+    if (Array.isArray(msg.pixelMap)) {
+      setServerPixelMap(msg.pixelMap);
+    }
   }, [ws.lastJsonMessage]);
 
 
@@ -164,6 +167,7 @@ export default function GameBoard() {
               imageData={getPixelArtImageData()}
               blockDimension={blockDimension}
               pickedColor={color.rgb}
+              predefinedPixelMap={serverPixelMap}
             />
           }
           {image && !pixelArt && <ArtPreviewCanvas width={dimension.width} height={dimension.height} image={image} onConfirm={handlePixelArtConfirmation} />}
