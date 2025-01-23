@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import useCanvas from "../hooks/useCanvas";
+import { usePlayerInfo } from "../contexts/PlayerInfoContext";
+import useWebSocket from "react-use-websocket";
 
 interface ArtCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
   image: HTMLImageElement;
@@ -11,15 +13,55 @@ interface ArtCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
 export default function ArtCanvas({ image, imageData, blockDimension, pickedColor, ...other }: ArtCanvasProps) {
 
   const { canvasRef, context, imgPosition, imgScale, clearCanvas } = useCanvas();
-  const [pixelMap, setPixelMap] = useState((() => {
-    const lengthX = Math.ceil(image.width / blockDimension);
-    const lengthY = Math.ceil(image.height / blockDimension);
-    const a = new Array(lengthX).fill(new Array(lengthY).fill(null));
-    return a;
-  })());
+  const lengthX = Math.ceil(image.width / blockDimension);
+  const lengthY = Math.ceil(image.height / blockDimension);
+  const [pixelMap, setPixelMap] = useState(
+    Array.from({ length: lengthX }).map(() => new Array(lengthY).fill(null))
+  );
+
+  // networking
+  const { username, roomId } = usePlayerInfo();
+
+  const WSS_URL = 'ws://localhost:3000';
+  const ws = useWebSocket(
+    WSS_URL,
+    {
+      queryParams: {
+        username,
+        roomId,
+      },
+      share: true,
+    },
+  );
+
+  // check for pixel art updates from other users
+  useEffect(() => {
+    const msg = ws.lastJsonMessage;
+
+    // validate type
+    if (!msg || typeof msg !== 'object' || 
+        !('x' in msg && typeof msg.x === 'number' && 
+          'y' in msg && typeof msg.y === 'number' && 
+          'c' in msg && Array.isArray(msg.c) && msg.c.length === 3)
+        ) {
+      return;
+   }
+   
+    const { x, y, c } = msg;
+    const color = { r: c[0], g: c[1], b: c[2] };
+    
+    if (JSON.stringify(pixelMap[x][y]) !== JSON.stringify(color)) {
+      setPixelMap((prev) => {
+        const newArr = [...prev];
+        newArr[x] = [...prev[x]];
+        newArr[x][y] = color;
+        return newArr;
+      });
+    }
+
+  }, [ws.lastJsonMessage]);
 
   useEffect(() => {
-    console.log("redraw");
     if (context) {
       clearCanvas();
       drawImage(context);
@@ -27,7 +69,6 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
   }, [imgPosition, imgScale, image, context, pixelMap]);
 
   useEffect(() => {
-    console.log("resize redraw");
     if (context) {
       context.setTransform(imgScale, 0, 0, imgScale, 0, 0);
       clearCanvas();
@@ -42,7 +83,7 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
     }
 
     function handleCanvasClick(e: MouseEvent) {
-      if (!canvasRef.current || !imageData) {
+      if (!canvasRef.current) {
         return;
       }
       const bounding = canvasRef.current.getBoundingClientRect();
@@ -64,13 +105,18 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
         const blockX = Math.floor(pixelX / blockDimension);
         const blockY = Math.floor(pixelY / blockDimension);
 
-        if (pixelMap[blockX][blockY] !== pickedColor) {
+        if (JSON.stringify(pixelMap[blockX][blockY]) !== JSON.stringify(pickedColor)) {
           setPixelMap((prev) => {
             const newArr = [...prev];
             newArr[blockX] = [...prev[blockX]];
             newArr[blockX][blockY] = pickedColor;
             return newArr;
           });
+
+          // send update to server
+          const { r, g, b } = pickedColor;
+          ws.sendJsonMessage({x:blockX, y:blockY, c:[r,g,b]});
+          
         }
 
       }
@@ -81,7 +127,7 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
     return () => {
       canvas.removeEventListener("click", handleCanvasClick);
     }
-  }, [canvasRef.current, imgPosition, imgScale, image, imageData]);
+  }, [canvasRef.current, imgPosition, imgScale, image, pixelMap, pickedColor]);
 
   function drawImage(ctx: CanvasRenderingContext2D) {
     if (!imageData) {
@@ -89,7 +135,7 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
     }
 
     ctx.drawImage(image, imgPosition.x, imgPosition.y);
-    
+
     // draw semi-transparent cover on top of pixel art to give the illusion of a guide 
     ctx.fillStyle = "#FFFFFFB3";
     ctx.fillRect(imgPosition.x, imgPosition.y, image.width, image.height);
@@ -134,8 +180,8 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
     // calculate where to stop drawing rgb() text on canvas
     //    x-y coordinates are relative to the <canvas> itself
     const endPoint = {
-      x: Math.ceil(Math.min(imgPosition.x+image.width, ctx.canvas.width/imgScale)),
-      y: Math.ceil(Math.min(imgPosition.y+image.height, ctx.canvas.height/imgScale)),
+      x: Math.ceil(Math.min(imgPosition.x + image.width, ctx.canvas.width / imgScale)),
+      y: Math.ceil(Math.min(imgPosition.y + image.height, ctx.canvas.height / imgScale)),
     }
 
     // calculate which blocks / pixels are actually visible on canvas
@@ -156,10 +202,10 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
       for (let y = startPoint.y; y < endPoint.y; y += blockDimension) {
         const textX = x + blockDimension / 2;
         const textY = y + blockDimension / 2;
-        
-        const red = (startPixel.y+(y-startPoint.y)) * (image.width * 4) + (startPixel.x+(x-startPoint.x)) * 4;
-        const { r, g, b } = {r: imageData.data[red], g: imageData.data[red+1], b: imageData.data[red+2]};
-        
+
+        const red = (startPixel.y + (y - startPoint.y)) * (image.width * 4) + (startPixel.x + (x - startPoint.x)) * 4;
+        const { r, g, b } = { r: imageData.data[red], g: imageData.data[red + 1], b: imageData.data[red + 2] };
+
         ctx.fillText(`rgb(${r},${g},${b})`, textX, textY, blockDimension);
       }
     }

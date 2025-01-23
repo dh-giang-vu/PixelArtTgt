@@ -2,7 +2,6 @@ import { RawData, WebSocketServer, WebSocket } from "ws";
 import UserManager from "./user";
 import RoomManager from "./room";
 import { IncomingMessage } from "http";
-import { isCoordinate } from "./utils";
 import { BufferLike } from "./types";
 
 const roomManager = new RoomManager();
@@ -62,8 +61,10 @@ function connectUser(socket: WebSocket, request: IncomingMessage) {
   else {
     socket.send(JSON.stringify({ imgChooser: 0 }));
     const image = roomManager.getRoomImage(r.roomId);
-    if (image) {
-      console.log(`Room ${r.roomId} has image`);
+    const pixelMap = roomManager.getPixelMap(r.roomId);
+    if (image && pixelMap) {
+      console.log(`Room ${r.roomId} has image and pixel map`);
+      socket.send(JSON.stringify({ pixelMap }));
       socket.send(image);
     }
   }
@@ -93,6 +94,12 @@ function handleMessage(userId: string, rawData: RawData, isBinary: boolean) {
       const imgData = roomManager.getRoomImage(roomId);
       broadcastByRoom(roomId, imgData, new Set([user.userId]));
     }
+  }
+  else {
+    // the only non-binary data we have are the color updates
+    const updateString = rawData.toString();
+    roomManager.updatePixelMap(user.roomId, updateString);
+    broadcastByRoom(user.roomId, rawData.toString(), new Set([user.userId]));
   }
 
   console.log("======================");

@@ -30,6 +30,7 @@ export default function GameBoard() {
         username,
         roomId,
       },
+      share: true,
     },
   );
 
@@ -65,8 +66,8 @@ export default function GameBoard() {
         const blockDimension = bytes[0];
 
         const binaryStringArr = [];
-        for (let i = 0; i < bytes.length - 1; i++) {
-          binaryStringArr.push(String.fromCharCode(bytes[i+1]));
+        for (let i = 0; i < bytes.length - 5; i++) {
+          binaryStringArr.push(String.fromCharCode(bytes[i+5]));
         }
         const binaryString = binaryStringArr.join('');
         const base64 = btoa(binaryString);
@@ -80,6 +81,15 @@ export default function GameBoard() {
       });
 
   }, [ws.lastMessage]);
+
+  // check for pixelMap sent by server
+  useEffect(() => {
+    const msg = ws.lastJsonMessage;
+    if (!msg || typeof msg !== 'object' || !('pixelMap' in msg)) {
+      return;
+    }
+    console.log(ws.lastJsonMessage);
+  }, [ws.lastJsonMessage]);
 
 
   function handleColorPickerChange(newColor: RgbColor | string) {
@@ -102,15 +112,27 @@ export default function GameBoard() {
   }
 
   async function handlePixelArtConfirmation(pixelArt: HTMLImageElement, blockDimension: number) {
+    if (!image) {
+      return;
+    }
+
     const index = pixelArt.src.indexOf("base64,") + "base64,".length;
     const base64String = pixelArt.src.slice(index);
 
     // convert base64 string to ArrayBuffer (binary data)
     const binaryString = atob(base64String);
     const bytes = new Uint8Array(binaryString.length + 1);
-    bytes[0] = blockDimension;    // attach block dimension to first byte
+    
+    const numBlocksX = Math.ceil(image.width / blockDimension);
+    const numBlocksY = Math.ceil(image.height / blockDimension);
+    bytes[0] = blockDimension;            // attach block dimension to first byte
+    bytes[1] = numBlocksX & 0xFF          // attach LSB of numBlocksX
+    bytes[2] = (numBlocksX >> 8) & 0xFF   // attach MSB of numBlocksX
+    bytes[3] = numBlocksY & 0xFF          // attach LSB of numBlocksY
+    bytes[4] = (numBlocksY >> 8) & 0xFF   // attach MSB of numBlocksY
+
     for (let i = 0; i < binaryString.length; i++) {
-      bytes[i + 1] = binaryString.charCodeAt(i);
+      bytes[i + 5] = binaryString.charCodeAt(i);
     }
 
     ws.sendMessage(bytes.buffer);
