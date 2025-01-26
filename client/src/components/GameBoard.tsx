@@ -11,6 +11,7 @@ import { RgbColor } from "react-colorful";
 import { hexToRgb, rgbToHex } from "../utils/colorConvert";
 import { usePlayerInfo } from "../contexts/PlayerInfoContext";
 import useWebSocket from "react-use-websocket";
+import MusicPlayer from "./MusicPlayer";
 
 export default function GameBoard() {
   const { ref, dimension } = useDivDimension();
@@ -145,7 +146,10 @@ export default function GameBoard() {
     <div className="game-board-grid-container">
 
       <div className="sidebar sidebar-top">
-        Music
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div>Music:</div>
+          <MusicPlayer />
+        </div>
       </div>
 
       <div className="sidebar sidebar-mid">
