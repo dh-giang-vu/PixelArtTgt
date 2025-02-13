@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import useCanvas from "../hooks/useCanvas";
 import { usePlayerInfo } from "../contexts/PlayerInfoContext";
 import useWebSocket from "react-use-websocket";
+import { decimalToHex } from "../utils/colorConvert";
 
 interface ArtCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
   image: HTMLImageElement;
@@ -13,6 +14,7 @@ interface ArtCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
 
 export default function ArtCanvas({ image, imageData, blockDimension, pickedColor, predefinedPixelMap, ...other }: ArtCanvasProps) {
 
+  const [imgOpacity, setImgOpacity] = useState(50);
   const { canvasRef, context, imgPosition, imgScale, clearCanvas } = useCanvas();
   const lengthX = Math.ceil(image.width / blockDimension);
   const lengthY = Math.ceil(image.height / blockDimension);
@@ -74,7 +76,7 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
       clearCanvas();
       drawImage(context);
     }
-  }, [imgPosition, imgScale, image, context, pixelMap]);
+  }, [imgPosition, imgScale, image, context, pixelMap, imgOpacity]);
 
   useEffect(() => {
     if (context) {
@@ -145,7 +147,8 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
     ctx.drawImage(image, imgPosition.x, imgPosition.y);
 
     // draw semi-transparent cover on top of pixel art to give the illusion of a guide 
-    ctx.fillStyle = "#FFFFFFB3";
+    const fillStyle = "#FFFFFF" + decimalToHex(Math.floor(imgOpacity/100 * 255));
+    ctx.fillStyle = fillStyle;
     ctx.fillRect(imgPosition.x, imgPosition.y, image.width, image.height);
 
     // draw blocks that have been coloured by people
@@ -220,6 +223,14 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
   }
 
   return (
-    <canvas ref={canvasRef} {...other} style={{ backgroundColor: "#757575" }}></canvas>
+    <div>
+      <canvas ref={canvasRef} {...other} style={{ backgroundColor: "#757575" }}></canvas>
+
+      <div style={{ position: "absolute", bottom: 0, display: "flex", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+        <label htmlFor="image-opacity">Image Opacity:</label>
+        <input type="range" id="image-opacity" name="image-opacity" min={0} max={100} value={imgOpacity} onChange={(e) => { setImgOpacity(parseInt(e.target.value)) }}/>
+        <span>{imgOpacity}%</span>
+      </div>
+    </div>
   );
 }

@@ -4,7 +4,7 @@ function hexToDecimal(hex: string) {
   return parseInt(hex, 16);
 }
 
-function decimalToHex(dec: number, numDigit = 2) {
+export function decimalToHex(dec: number, numDigit = 2) {
   let hex = dec.toString(16);
   if (hex.length < numDigit) {
     hex = hex.padStart(numDigit, '0');
