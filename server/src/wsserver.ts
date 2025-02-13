@@ -23,6 +23,9 @@ function initialiseWebSocketServer(wss: WebSocketServer) {
     socket.on('close', () => {
       const newImgChooser = roomManager.removeUserFromRoom(userId, roomId);
       userManager.deleteUser(userId);
+      if (roomManager.getRoom(roomId)) {
+        broadcastByRoom(roomId, JSON.stringify({ numOnline: roomManager.getNumUsersFromRoom(roomId) }));
+      }
 
       if (newImgChooser) {
         const chooserSocket = userManager.getUserSocketById(newImgChooser);
@@ -71,6 +74,7 @@ function connectUser(socket: WebSocket, request: IncomingMessage) {
 
   // Notify other users
   broadcastByRoom(r.roomId, `User ${r.username} joined room ${r.roomId}.`);
+  broadcastByRoom(r.roomId, JSON.stringify({ numOnline: roomManager.getNumUsersFromRoom(r.roomId) }));
 
   return r;
 }

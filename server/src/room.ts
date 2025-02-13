@@ -34,8 +34,16 @@ class RoomManager {
     return null;
   }
 
+  getRoom(roomId: string) {
+    return this.rooms[roomId];
+  }
+
   getAllUsersFromRoom(roomId: string) {
     return this.rooms[roomId].allUsers;
+  }
+
+  getNumUsersFromRoom(roomId: string) {
+    return this.rooms[roomId].allUsers.size;
   }
 
   getImgChooserId(roomId: string) {

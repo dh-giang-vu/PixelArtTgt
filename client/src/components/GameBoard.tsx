@@ -15,6 +15,7 @@ import MusicPlayer from "./MusicPlayer";
 
 export default function GameBoard() {
   const { ref, dimension } = useDivDimension();
+  const [numOnline, setNumOnline] = useState(1);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [color, setColor] = useState<CustomColor>({
     rgb: { r: 0, g: 0, b: 0 },
@@ -95,6 +96,14 @@ export default function GameBoard() {
     }
   }, [ws.lastJsonMessage]);
 
+  // check for number of online people sent by server
+  useEffect(() => {
+    const msg = ws.lastJsonMessage;
+    if (msg && typeof msg === 'object' && 'numOnline' in msg && typeof msg.numOnline === 'number') {
+      setNumOnline(msg.numOnline)
+    }
+  })
+
 
   function handleColorPickerChange(newColor: RgbColor | string) {
     let newHex = "#000000";
@@ -158,7 +167,7 @@ export default function GameBoard() {
       </div>
 
       <div className="sidebar sidebar-bot">
-        Online: 1
+        Online: {numOnline}
       </div>
 
       <div className="main" style={{ overflow: "hidden", position: "relative" }} ref={ref}>
