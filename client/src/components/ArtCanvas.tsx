@@ -224,7 +224,7 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
 
   return (
     <div>
-      <canvas ref={canvasRef} {...other} style={{ backgroundColor: "#757575" }}></canvas>
+      <canvas ref={canvasRef} {...other}></canvas>
 
       <div style={{ position: "absolute", bottom: 0, display: "flex", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
         <label htmlFor="image-opacity">Image Opacity:</label>

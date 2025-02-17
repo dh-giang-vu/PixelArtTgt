@@ -181,9 +181,17 @@ export default function GameBoard() {
               blockDimension={blockDimension}
               pickedColor={color.rgb}
               predefinedPixelMap={serverPixelMap}
+              style={{ backgroundColor: "#757575" }}
             />
           }
-          {image && !pixelArt && <ArtPreviewCanvas width={dimension.width} height={dimension.height} image={image} onConfirm={handlePixelArtConfirmation} />}
+          {image && !pixelArt && 
+            <ArtPreviewCanvas 
+              width={dimension.width} 
+              height={dimension.height} 
+              image={image} 
+              onConfirm={handlePixelArtConfirmation}
+              style={{ backgroundColor: "#757575" }} 
+            />}
           {isImageChooser === null && <h1>Loading...</h1>}
           {!image && !pixelArt && isImageChooser === false && <h1>Waiting for host...</h1>}
           {!image && !pixelArt && isImageChooser === true && <ImageUploader onUpload={(img) => setImage(img)} />}
