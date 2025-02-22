@@ -36,7 +36,7 @@ export default function GameBoard() {
     },
   );
 
-  const { pixelArt, blockDimension, getPixelArtImageData, setPixelArt, setBlockDimension } = usePixelArtContext();
+  const { pixelArt, blockDimension, setPixelArt, setBlockDimension } = usePixelArtContext();
   const [serverPixelMap, setServerPixelMap] = useState<any[][] | null>(null);
 
   // check isImageChooser
@@ -177,7 +177,6 @@ export default function GameBoard() {
               width={dimension.width}
               height={dimension.height}
               image={pixelArt}
-              imageData={getPixelArtImageData()}
               blockDimension={blockDimension}
               pickedColor={color.rgb}
               predefinedPixelMap={serverPixelMap}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import useCanvas from "../hooks/useCanvas";
 import { usePlayerInfo } from "../contexts/PlayerInfoContext";
 import useWebSocket from "react-use-websocket";
@@ -6,13 +6,12 @@ import { decimalToHex } from "../utils/colorConvert";
 
 interface ArtCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
   image: HTMLImageElement;
-  imageData: ImageData | null;
   blockDimension: number;
   pickedColor: { r: number, g: number, b: number };
   predefinedPixelMap: any[][] | null;
 }
 
-export default function ArtCanvas({ image, imageData, blockDimension, pickedColor, predefinedPixelMap, ...other }: ArtCanvasProps) {
+export default function ArtCanvas({ image, blockDimension, pickedColor, predefinedPixelMap, ...other }: ArtCanvasProps) {
 
   const [imgOpacity, setImgOpacity] = useState(50);
   const { canvasRef, context, imgPosition, imgScale, clearCanvas } = useCanvas();
@@ -21,6 +20,22 @@ export default function ArtCanvas({ image, imageData, blockDimension, pickedColo
   const [pixelMap, setPixelMap] = useState(
     Array.from({ length: lengthX }).map(() => new Array(lengthY).fill(null))
   );
+
+  const imageData = useMemo(() => {
+    let canvas = Object.assign(document.createElement('canvas'), {
+      width: image.width,
+      height: image.height
+    });
+  
+    const context = canvas.getContext('2d');
+    if (!context) {
+      return null;
+    }
+  
+    context.drawImage(image, 0, 0);
+    const imgData = context.getImageData(0, 0, image.width, image.height);
+    return imgData;
+  }, []);
 
   // networking
   const { username, roomId } = usePlayerInfo();
