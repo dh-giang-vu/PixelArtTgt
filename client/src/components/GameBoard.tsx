@@ -158,14 +158,18 @@ export default function GameBoard() {
               style={{ backgroundColor: "#757575" }}
             />
           }
-          {image && !pixelArt && 
-            <ArtPreviewCanvas 
+          {image && !pixelArt &&
+            <>
+              <ArtPreviewCanvas 
               width={dimension.width} 
               height={dimension.height} 
               image={image} 
               onConfirm={handlePixelArtConfirmation}
               style={{ backgroundColor: "#757575" }} 
-            />}
+              />
+              <button style={{ position: "absolute", top: 0 }} onClick={() => setImage(null)}>{"< "}Choose Another Image</button>
+            </>
+          }
           {isImageChooser === null && <h1>Loading...</h1>}
           {!image && !pixelArt && isImageChooser === false && <h1>Waiting for host...</h1>}
           {!image && !pixelArt && isImageChooser === true && <ImageUploader onUpload={(img) => setImage(img)} />}
