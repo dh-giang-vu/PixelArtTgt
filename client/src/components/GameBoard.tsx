@@ -1,5 +1,4 @@
-// import CustomColorPicker from "./TempCustomPicker";
-import CustomColorPicker, { CustomColor } from "./CustomColorPicker";
+import CustomColorPicker from "./CustomColorPicker";
 import '../styles/game-board.css';
 import useDivDimension from "../hooks/useElementDimension";
 import { useEffect, useState } from "react";
@@ -8,7 +7,6 @@ import ArtPreviewCanvas from "./ArtPreviewCanvas";
 import { usePixelArtContext } from "../contexts/PixelArtContext";
 import ArtCanvas from "./ArtCanvas";
 import { RgbColor } from "react-colorful";
-import { hexToRgb, rgbToHex } from "../utils/colorConvert";
 import { usePlayerInfo } from "../contexts/PlayerInfoContext";
 import useWebSocket from "react-use-websocket";
 import MusicPlayer from "./MusicPlayer";
@@ -17,10 +15,7 @@ export default function GameBoard() {
   const { ref, dimension } = useDivDimension();
   const [numOnline, setNumOnline] = useState(1);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
-  const [color, setColor] = useState<CustomColor>({
-    rgb: { r: 0, g: 0, b: 0 },
-    hex: "#000000"
-  });
+  const [color, setColor] = useState<RgbColor>({ r: 0, g: 0, b: 0 });
   const [isImageChooser, setIsImageChooser] = useState<boolean | null>(null);
   const { username, roomId } = usePlayerInfo();
 
@@ -104,26 +99,6 @@ export default function GameBoard() {
     }
   })
 
-
-  function handleColorPickerChange(newColor: RgbColor | string) {
-    let newHex = "#000000";
-    let newRgb = { r: 0, g: 0, b: 0 };
-    // hex input was changed
-    if (typeof newColor === "string") {
-      newRgb = hexToRgb(newColor);
-      newHex = newColor;
-    }
-    // rgb input was changed
-    else {
-      newRgb = newColor;
-      newHex = rgbToHex(newColor);
-    }
-    setColor({
-      rgb: newRgb,
-      hex: newHex
-    });
-  }
-
   async function handlePixelArtConfirmation(pixelArt: HTMLImageElement, blockDimension: number) {
     if (!image) {
       return;
@@ -162,8 +137,8 @@ export default function GameBoard() {
       </div>
 
       <div className="sidebar sidebar-mid">
-        <CustomColorPicker orientation="v" color={color} onChange={handleColorPickerChange} />
-        <CustomColorPicker orientation="h" color={color} onChange={handleColorPickerChange} />
+        <CustomColorPicker orientation="v" color={color} setColor={setColor} />
+        <CustomColorPicker orientation="h" color={color} setColor={setColor} />
       </div>
 
       <div className="sidebar sidebar-bot">
@@ -178,7 +153,7 @@ export default function GameBoard() {
               height={dimension.height}
               image={pixelArt}
               blockDimension={blockDimension}
-              pickedColor={color.rgb}
+              pickedColor={color}
               predefinedPixelMap={serverPixelMap}
               style={{ backgroundColor: "#757575" }}
             />
