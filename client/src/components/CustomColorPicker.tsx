@@ -13,8 +13,28 @@ interface CustomColorPickerProps {
   setColor: (newColor: RgbColor) => void;
 }
 
-// TO DO: the form current allow input > 255 - fix this
 export default function CustomColorPicker({ orientation = "v", color, setColor }: CustomColorPickerProps) {
+
+  function handleRgbFormChange(e: React.FormEvent<HTMLFormElement>) {
+    if (!(e.target instanceof HTMLInputElement)) {
+      return;
+    }
+
+    const num = e.target.value;
+    if (Number.isNaN(num) || parseInt(num) < 0 || parseInt(num) > 255) {
+      return;
+    }
+
+    if (e.target.id === "red") {
+      setColor({ ...color, r: parseInt(num) });
+    }
+    else if (e.target.id === "green") {
+      setColor({ ...color, g: parseInt(num) });
+    }
+    else if (e.target.id === "blue") {
+      setColor({ ...color, b: parseInt(num) });
+    }
+  }
   
   return (
     <div className={"color-picker-container" + (orientation === "h" ? " horizontal" : " vertical")} >
@@ -22,18 +42,18 @@ export default function CustomColorPicker({ orientation = "v", color, setColor }
 
       <div className={"color-input-container" + (orientation === "h" ? " horizontal" : " vertical")}>
 
-        <form className="rgb-input">
+        <form className="rgb-input" onChange={handleRgbFormChange}>
           <div>
             <label htmlFor="red">R:</label>
-            <input type="number" value={color.r} min={0} max={255} name="red" id="red" onChange={e => setColor({ ...color, r: parseInt(e.target.value) })} />
+            <input type="number" value={color.r} min={0} max={255} name="red" id="red" onChange={() => {}} />
           </div>
           <div>
             <label htmlFor="green">G:</label>
-            <input type="number" value={color.g} min={0} max={255} name="green" id="green" onChange={e => setColor({ ...color, g: parseInt(e.target.value) })} />
+            <input type="number" value={color.g} min={0} max={255} name="green" id="green" onChange={() => {}} />
           </div>
           <div>
             <label htmlFor="blue">B:</label>
-            <input type="number" value={color.b} min={0} max={255} name="blue" id="blue" onChange={e => setColor({ ...color, b: parseInt(e.target.value) })} />
+            <input type="number" value={color.b} min={0} max={255} name="blue" id="blue" onChange={() => {}} />
           </div>
         </form>
 
