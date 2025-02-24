@@ -1,9 +1,9 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, CanvasHTMLAttributes } from 'react';
 import useKeyDown from './useKeyDown';
 
 const POSITION_CHANGE = 5;
 
-export default function useCanvas() {
+export default function useCanvas(drawImage: (ctx: CanvasRenderingContext2D) => void, width: CanvasHTMLAttributes<number>["width"], height: CanvasHTMLAttributes<number>["width"]) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [imgPosition, setImgPosition] = useState({ x: 0, y: 0 });
@@ -21,6 +21,24 @@ export default function useCanvas() {
       }
     }
   }, [canvasRef.current]);
+
+  // redraw when resizing canvas element
+  useEffect(() => {
+    if (context) {
+      context.setTransform(imgScale, 0, 0, imgScale, 0, 0);
+      clearCanvas();
+      drawImage(context);
+    }
+
+  }, [width, height]);
+  
+  // redraw when changing image position or image scale
+  useEffect(() => {
+    if (context) {
+      clearCanvas();
+      drawImage(context);
+    }
+  }, [imgPosition, imgScale, context]);
 
   // image panning listener
   useEffect(() => {

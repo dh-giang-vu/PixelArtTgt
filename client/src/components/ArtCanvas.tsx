@@ -14,7 +14,7 @@ interface ArtCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
 export default function ArtCanvas({ image, blockDimension, pickedColor, predefinedPixelMap, ...other }: ArtCanvasProps) {
 
   const [imgOpacity, setImgOpacity] = useState(50);
-  const { canvasRef, context, imgPosition, imgScale, clearCanvas } = useCanvas();
+  const { canvasRef, context, imgPosition, imgScale, clearCanvas } = useCanvas(drawImage, other.width, other.height);
   const lengthX = Math.ceil(image.width / blockDimension);
   const lengthY = Math.ceil(image.height / blockDimension);
   const [pixelMap, setPixelMap] = useState(
@@ -91,16 +91,7 @@ export default function ArtCanvas({ image, blockDimension, pickedColor, predefin
       clearCanvas();
       drawImage(context);
     }
-  }, [imgPosition, imgScale, image, context, pixelMap, imgOpacity]);
-
-  useEffect(() => {
-    if (context) {
-      context.setTransform(imgScale, 0, 0, imgScale, 0, 0);
-      clearCanvas();
-      drawImage(context);
-    }
-
-  }, [other.width, other.height]);
+  }, [image, pixelMap, imgOpacity]);
 
   useEffect(() => {
     if (!canvasRef.current) {

@@ -10,28 +10,17 @@ interface ArtPreviewCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasEle
 }
 
 export default function ArtPreviewCanvas({image, onConfirm, ...other} : ArtPreviewCanvasProps) {
-  const { canvasRef, context, imgPosition, imgScale, clearCanvas } = useCanvas();
+  const { canvasRef, context, imgPosition, clearCanvas } = useCanvas(drawImage, other.width, other.height);
   const { processedImg, ...imgSettings } = useProcessedImage(image);
   const [isSettingVisible, setIsSettingVisible] = useState(true);
   const { setPixelArt, setBlockDimension } = usePixelArtContext();
 
   useEffect(() => {
-    console.log("redraw");
     if (context) {
       clearCanvas();
       drawImage(context);
     }
-  }, [imgPosition, imgScale, processedImg, context]);
-
-  useEffect(() => {
-    console.log("resize redraw");
-    if (context) {
-      context.setTransform(imgScale, 0, 0, imgScale, 0, 0);
-      clearCanvas();
-      drawImage(context);
-    }
-
-  }, [other.width, other.height]);
+  }, [processedImg]);
 
   function drawImage(ctx: CanvasRenderingContext2D) {
     if (processedImg) {

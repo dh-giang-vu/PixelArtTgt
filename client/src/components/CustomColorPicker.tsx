@@ -13,6 +13,7 @@ interface CustomColorPickerProps {
   setColor: (newColor: RgbColor) => void;
 }
 
+// TO DO: the form current allow input > 255 - fix this
 export default function CustomColorPicker({ orientation = "v", color, setColor }: CustomColorPickerProps) {
   
   return (
